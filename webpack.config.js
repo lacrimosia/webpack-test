@@ -1,5 +1,6 @@
 var webpack = require('webpack'),
 path = require('path');
+var json = require("dev/data/json!./file.json");
 
 
 module.exports = {
@@ -16,6 +17,10 @@ module.exports = {
         {
             test: /\.scss$/,
             loaders: ["style", "css", "sass"]
+        },
+        { 
+            test: /\.json/, 
+            loader: "json" 
         },
         {
             test:/\.js$/,
