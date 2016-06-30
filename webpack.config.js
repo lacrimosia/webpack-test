@@ -12,9 +12,19 @@ module.exports = {
         filename: '[name].js'
     },
     module: {
-        loaders: [{
+        loaders: [
+        {
             test: /\.scss$/,
             loaders: ["style", "css", "sass"]
-        }]
+        },
+        {
+            test:/\.js$/,
+            exclude: /(node_modules)/,
+            loader: 'babel',
+            query:{
+                presets: ['es2015', 'react']
+            }
+        }
+      ]
     }
 };

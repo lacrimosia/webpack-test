@@ -1,1 +1,1 @@
-Webpack Test repo
+Webpack Test repo setup with React
