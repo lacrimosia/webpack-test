@@ -6,6 +6,8 @@ $('.box').text(t); */
 
 import React from 'react';
 import {render} from 'react-dom';
+import Buttons from './buttons';
+import Footer from './footer';
 
 class App extends React.Component {
     constructor(props) {
@@ -13,7 +15,10 @@ class App extends React.Component {
         this.displayName = 'Angelo Carpenter';
     }
     render() {
-        return <div>{this.displayName}</div>;
+        return <div>
+        			<Buttons />
+        			<Footer />
+        	   </div>
     }
 }
 
