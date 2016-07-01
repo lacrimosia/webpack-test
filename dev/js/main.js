@@ -8,15 +8,16 @@ import React from 'react';
 import {render} from 'react-dom';
 import Buttons from './buttons';
 import Footer from './footer';
+import Header from './Header';
 
 class App extends React.Component {
     constructor(props) {
         super(props);
-        this.displayName = 'Angelo Carpenter';
     }
     render() {
         return <div>
-        			<Buttons />
+        			<Header />
+        			<Buttons position={Buttons.id}/>
         			<Footer />
         	   </div>
     }
