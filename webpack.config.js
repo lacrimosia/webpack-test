@@ -1,7 +1,6 @@
 var webpack = require('webpack'),
     path = require('path');
-
-    // var json = require("./dev/data/json!./file.json");
+// var json = require("json!./data/data.json");
 
 
 module.exports = {
@@ -19,7 +18,7 @@ module.exports = {
             loaders: ["style", "css", "sass"]
         }, {
             test: /\.json/,
-            loader: "json"
+            loader: "json-loader"
         }, {
             test: /\.js$/,
             exclude: /(node_modules)/,
