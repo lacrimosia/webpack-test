@@ -1,6 +1,7 @@
 var webpack = require('webpack'),
-path = require('path');
-var json = require("dev/data/json!./file.json");
+    path = require('path');
+
+    // var json = require("./dev/data/json!./file.json");
 
 
 module.exports = {
@@ -13,23 +14,26 @@ module.exports = {
         filename: '[name].js'
     },
     module: {
-        loaders: [
-        {
+        loaders: [{
             test: /\.scss$/,
             loaders: ["style", "css", "sass"]
-        },
-        { 
-            test: /\.json/, 
-            loader: "json" 
-        },
-        {
-            test:/\.js$/,
+        }, {
+            test: /\.json/,
+            loader: "json"
+        }, {
+            test: /\.js$/,
             exclude: /(node_modules)/,
             loader: 'babel',
-            query:{
+            query: {
                 presets: ['es2015', 'react']
             }
+        },
+        {
+            test: /\.(png|jpg|gif)$/,
+            loader: 'url-loader?limit=200000'
+        }],
+        sassLoader: {
+            includePaths: [path.resolve(__dirname, "./public/css/")]
         }
-      ]
     }
 };

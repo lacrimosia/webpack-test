@@ -1,6 +1,7 @@
 'use strict';
 
 import React from 'react';
+require("../scss/app.scss");
 
 class Buttons extends React.Component {
     constructor(props) {
@@ -8,7 +9,10 @@ class Buttons extends React.Component {
         this.displayName = 'Buttons Component';
     }
     render() {
-        return <div>{this.displayName}</div>;
+        return (<div>
+        			<p>{this.displayName}</p>
+        		</div>
+        	);
     }
 }
 
