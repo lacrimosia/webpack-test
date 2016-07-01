@@ -205,8 +205,8 @@ body{
 }
 
 .sele{
-  float: left;
   padding: 5px 5px 11px 5px;
+  float: left;
   @include wh(188px, 25px);
 }
 
@@ -226,11 +226,11 @@ span{
 	color: #ffffff;
 	border: none;
 	cursor: pointer;
-	float: left;
 	margin-right: 5px;
 	padding: 7px;
 	transition: background linear .2s;
 	outline: none;
+	float: left;
 }
 
 /* selected class */

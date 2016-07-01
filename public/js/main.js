@@ -66,11 +66,11 @@
 
 	var _buttons2 = _interopRequireDefault(_buttons);
 
-	var _footer = __webpack_require__(178);
+	var _footer = __webpack_require__(179);
 
 	var _footer2 = _interopRequireDefault(_footer);
 
-	var _Header = __webpack_require__(179);
+	var _Header = __webpack_require__(180);
 
 	var _Header2 = _interopRequireDefault(_Header);
 
@@ -20431,8 +20431,8 @@
 	var data = __webpack_require__(173);
 	var $ = __webpack_require__(174);
 	var _ = __webpack_require__(175);
-	var FontAwesome = __webpack_require__(180);
-	var classNames = __webpack_require__(177);
+	var FontAwesome = __webpack_require__(177);
+	var classNames = __webpack_require__(178);
 
 	var Buttons = function (_React$Component) {
 	    _inherits(Buttons, _React$Component);
@@ -20444,28 +20444,140 @@
 
 	        _this.traits = data.traits;
 	        _this.shuffleArray = _.shuffle(_this.traits);
+	        _this.masculine = 0; // gather all masculine selected traits
+	        _this.feminine = 0; // gather all feminine traits
+	        _this.ctx = document.getElementById("graph");
+	        _this.selected = false;
+	        // keyboard shortcuts for accessibility
+	        _this.current = 0; // set the current to first slide
+	        _this.enabled = false; // hide intro screen
+	        _this.disableKey = true; // disable keyboard until intro screen is hidden
+	        _this.userSelect = []; // this pushes the selected traits
+	        _this.current = 0;
 	        return _this;
 	    }
 
 	    _createClass(Buttons, [{
+	        key: 'getIdSelection',
+	        value: function getIdSelection(Id) {
+	            this.current = 0;
+	            _.forEach(this.shuffleArray, function (value, key) {
+	                if (key == Id) {
+	                    this.current = Id;
+	                }
+	            });
+	            this.shuffleArray[current].selected = !this.shuffleArray[current].selected;
+	            console.log("when clicked", this.shuffleArray[current].name + ': ' + this.shuffleArray[current].selected);
+	            // toggle classes on click
+	            this.traitToggle(this.shuffleArray[current].selected, Id, this.shuffleArray[current].type, this.shuffleArray[current].name);
+
+	            // checks if any traits are selected or not
+	            if (this.masculine == 0 && this.feminine == 0) {
+	                this.selected = false;
+	            } else {
+	                this.selected = true;
+	            }
+
+	            return this.current;
+	        }
+	    }, {
+	        key: 'traitToggle',
+	        value: function traitToggle(selection, ob, trait, name) {
+	            // selection - the current selected key
+	            // True - element selected, False - element not selected
+	            // ob - the selected element      
+	            // if selected add class green, if button is unselcted add class red
+	            if (selection == true) {
+	                $('#' + ob).addClass('green'); // add class green
+	                $('#' + ob).html('<i class="fa fa-check-circle"></i>');
+	                this.selectedTraits(trait);
+
+	                // push user selected traits to show later
+	                this.userSelect.push({
+	                    choice: name,
+	                    type: trait
+	                });
+	                //  console.log('userSelect', userSelect);
+
+	                if ($('#' + ob).hasClass('red')) {
+	                    $('#' + ob).removeClass('red'); // remove class red if already added
+	                }
+	            } else {
+	                $('#' + ob).addClass('red'); // add class red
+	                $('#' + ob).html('<i class="fa fa-times-circle"></i>');
+	                this.unselectedTraits(trait);
+	                // find unselected trait and remove from list
+	                // var findRemoveTrait = _.findIndex(userSelect, {'choice': name, 'type': trait});
+
+	                var removeElement = _.reject(userSelect, { 'choice': name, 'type': trait });
+	                // var sortedListSelected = _.orderBy(removeElement, ['choice', name]);
+	                //  console.log('removeElement', removeElement);
+	                this.userSelect = removeElement;
+
+	                console.log('removed userSelect', this.userSelect);
+
+	                if ($('#' + ob).hasClass('green')) {
+	                    $('#' + ob).removeClass('green'); // remove class green if already added
+	                }
+	                return this.userSelect;
+	            }
+	        }
+	    }, {
+	        key: 'selectedTraits',
+	        value: function selectedTraits(trait) {
+	            // check type of trait selected and push into proper array
+	            if (trait === 'masculine') {
+	                this.masculine += 1;
+	                console.log('masculine', this.masculine);
+	                return this.masculine;
+	            } else if (trait === 'feminine') {
+	                this.feminine += 1;
+	            } else {
+	                console.log("no trait type");
+	            }
+	        }
+	    }, {
+	        key: 'unselectedTraits',
+	        value: function unselectedTraits(trait) {
+	            // check type of trait selected and push into proper array
+	            if (trait === 'masculine' && masculine > 0) {
+	                this.masculine -= 1;
+	                console.log('masculine', this.masculine);
+	                return masculine;
+	            } else if (trait === 'feminine' && this.feminine > 0) {
+	                this.feminine -= 1;
+	            } else {
+	                console.log("no trait type");
+	            }
+	        }
+	    }, {
+	        key: 'getID',
+	        value: function getID(item, e) {
+	            //this.getIdSelection.bind(this, this.props.id)
+	            console.log(item.id);
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
+	            var _this2 = this;
+
 	            return _react2.default.createElement(
 	                'div',
 	                { className: 'traits' },
 	                this.shuffleArray.map(function (key, value) {
+	                    var id = _this2.getID.bind(_this2, value);
 	                    return _react2.default.createElement(
 	                        'div',
 	                        { className: "sele " + (value + parseInt(1)), key: value },
 	                        _react2.default.createElement(
 	                            'button',
-	                            { className: "traitsButton " + this.shuffleArray[value].type, id: value, tabindex: value + 1 },
-	                            _react2.default.createElement(FontAwesome, { className: 'xmark', name: 'times-circle', size: 'lg' })
+	                            { onClick: _this2.getID.bind(_this2), className: "traitsButton " + _this2.shuffleArray[value].type, id: value, tabindex: value + 1 },
+	                            _react2.default.createElement(FontAwesome, { className: 'xmark', name: 'times-circle' })
 	                        ),
 	                        _react2.default.createElement(
 	                            'span',
 	                            { 'for': value },
-	                            this.shuffleArray[value].name
+	                            _this2.shuffleArray[value].name
 	                        )
 	                    );
 	                }, this),
@@ -20526,7 +20638,7 @@
 
 
 	// module
-	exports.push([module.id, "body {\n  background: #ffffff;\n  color: #ffffff;\n  padding: 0;\n  margin: 0;\n  font-family: sans-serif, verdana !important; }\n\n.intro,\n.help_Menu {\n  position: absolute;\n  top: 0px;\n  left: 0px;\n  z-index: 100000;\n  width: 800px;\n  height: 701px;\n  /* background: rgba(0, 0, 0, 0.6); */\n  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#1b1f4e+21,393f7d+38,aa0ce9+55,d4001d+71,ed5901+85,ef9719+98&0.46+0,0.5+100;wmst2 */\n  background: -moz-linear-gradient(top, rgba(27, 31, 78, 0.46) 0%, rgba(27, 31, 78, 0.47) 21%, rgba(57, 63, 125, 0.48) 38%, rgba(170, 12, 233, 0.49) 55%, rgba(212, 0, 29, 0.49) 71%, rgba(237, 89, 1, 0.49) 85%, rgba(239, 151, 25, 0.5) 98%, rgba(239, 151, 25, 0.5) 100%);\n  /* FF3.6-15 */\n  background: -webkit-linear-gradient(top, rgba(27, 31, 78, 0.46) 0%, rgba(27, 31, 78, 0.47) 21%, rgba(57, 63, 125, 0.48) 38%, rgba(170, 12, 233, 0.49) 55%, rgba(212, 0, 29, 0.49) 71%, rgba(237, 89, 1, 0.49) 85%, rgba(239, 151, 25, 0.5) 98%, rgba(239, 151, 25, 0.5) 100%);\n  /* Chrome10-25,Safari5.1-6 */\n  background: linear-gradient(to bottom, rgba(27, 31, 78, 0.46) 0%, rgba(27, 31, 78, 0.47) 21%, rgba(57, 63, 125, 0.48) 38%, rgba(170, 12, 233, 0.49) 55%, rgba(212, 0, 29, 0.49) 71%, rgba(237, 89, 1, 0.49) 85%, rgba(239, 151, 25, 0.5) 98%, rgba(239, 151, 25, 0.5) 100%);\n  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */\n  filter: progid:XImageTransform.Microsoft.gradient( startColorstr='#751b1f4e', endColorstr='#80ef9719', GradientType=0);\n  /* IE6-9 */ }\n\n.intro_Button {\n  opacity: 1 !important;\n  position: relative;\n  top: 150px;\n  left: 220px;\n  z-index: 0;\n  width: 350px;\n  height: 150px;\n  /* background: #4C4C4C; */\n  border: none;\n  cursor: pointer; }\n\n.help_Button {\n  opacity: 1 !important;\n  position: relative;\n  position: relative;\n  top: -70px;\n  left: 388px;\n  z-index: 0;\n  width: 250px;\n  height: 75px;\n  /* background: #D4001D; */\n  border: none;\n  cursor: pointer;\n  color: #ffffff;\n  font-size: 1.5em;\n  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#ea001f+0,bf0019+100 */\n  background: #ea001f;\n  /* Old browsers */\n  background: -moz-linear-gradient(top, #ea001f 0%, #bf0019 100%);\n  /* FF3.6-15 */\n  background: -webkit-linear-gradient(top, #ea001f 0%, #bf0019 100%);\n  /* Chrome10-25,Safari5.1-6 */\n  background: linear-gradient(to bottom, #ea001f 0%, #bf0019 100%);\n  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */\n  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ea001f', endColorstr='#bf0019', GradientType=0);\n  /* IE6-9 */ }\n\n.keyboard_Div {\n  position: relative;\n  top: 165px;\n  left: 62px;\n  z-index: 0;\n  width: 650px;\n  height: 360px;\n  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#383838+0,111111+100 */\n  background: #383838;\n  /* Old browsers */\n  background: -moz-linear-gradient(45deg, #383838 0%, #111111 100%);\n  /* FF3.6-15 */\n  background: -webkit-linear-gradient(45deg, #383838 0%, #111111 100%);\n  /* Chrome10-25,Safari5.1-6 */\n  background: linear-gradient(45deg, #383838 0%, #111111 100%);\n  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */\n  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#383838', endColorstr='#111111', GradientType=1);\n  /* IE6-9 fallback on horizontal gradient */\n  border: 1px solid #444444;\n  padding: 10px; }\n\n.keyboard_Div ul li {\n  list-style: none;\n  color: #ffffff;\n  font-size: 1.3em;\n  margin-bottom: 6px;\n  margin-left: 35px; }\n\n.keyboard_Div h1 {\n  text-align: center;\n  color: #ffffff; }\n\n.keyboard_Div h4 {\n  text-align: left;\n  color: #ffffff; }\n\n.keyboard_Div p {\n  text-align: center;\n  color: #ffffff; }\n\n.help_Button:hover {\n  /*background: #ED5901; */\n  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#f25a02+0,e25402+100 */\n  background: #f25a02;\n  /* Old browsers */\n  background: -moz-linear-gradient(top, #f25a02 0%, #e25402 100%);\n  /* FF3.6-15 */\n  background: -webkit-linear-gradient(top, #f25a02 0%, #e25402 100%);\n  /* Chrome10-25,Safari5.1-6 */\n  background: linear-gradient(to bottom, #f25a02 0%, #e25402 100%);\n  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */\n  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f25a02', endColorstr='#e25402', GradientType=0);\n  /* IE6-9 */ }\n\n.intro_Button:hover {\n  background: #636363; }\n\n.keyButtons {\n  background: #111111;\n  border-radius: 6px;\n  border: 1px solid #A0A0A0;\n  padding: 5px;\n  font-size: 0.7em !important;\n  width: 20px;\n  height: 10px; }\n\n.intro_Button h1 {\n  font-size: 3em;\n  color: #E2E2E2; }\n\n/* hide timeline background container */\n.tl-timenav-slider-background {\n  /*display: none !important;*/ }\n\n/* instructions */\n.instructions {\n  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#1b1f4e+21,393f7d+38,aa0ce9+55,d4001d+71,ed5901+85,ef9719+98;wmst */\n  background: #1b1f4e;\n  /* Old browsers */\n  background: -moz-linear-gradient(left, #1b1f4e 21%, #393f7d 38%, #aa0ce9 55%, #d4001d 71%, #ed5901 85%, #ef9719 98%);\n  /* FF3.6-15 */\n  background: -webkit-linear-gradient(left, #1b1f4e 21%, #393f7d 38%, #aa0ce9 55%, #d4001d 71%, #ed5901 85%, #ef9719 98%);\n  /* Chrome10-25,Safari5.1-6 */\n  background: linear-gradient(to right, #1b1f4e 21%, #393f7d 38%, #aa0ce9 55%, #d4001d 71%, #ed5901 85%, #ef9719 98%);\n  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */\n  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1b1f4e', endColorstr='#ef9719', GradientType=1);\n  /* IE6-9 */\n  position: relative;\n  top: 0px;\n  left: 0px;\n  z-index: 50;\n  width: 780px;\n  height: 50px; }\n\n/* header bar */\n.header {\n  /* background: #222222;*/\n  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#383838+0,111111+100 */\n  background: #383838;\n  /* Old browsers */\n  background: -moz-linear-gradient(45deg, #383838 0%, #111111 100%);\n  /* FF3.6-15 */\n  background: -webkit-linear-gradient(45deg, #383838 0%, #111111 100%);\n  /* Chrome10-25,Safari5.1-6 */\n  background: linear-gradient(45deg, #383838 0%, #111111 100%);\n  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */\n  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#383838', endColorstr='#111111', GradientType=1);\n  /* IE6-9 fallback on horizontal gradient */\n  font-family: sans-serif, verdana !important;\n  color: #f1f1f1;\n  position: relative;\n  top: 0px;\n  left: 0px;\n  z-index: 60;\n  width: 800px;\n  height: 31px; }\n\n.titles {\n  float: left;\n  margin-top: -15px; }\n\n.menu {\n  float: right; }\n\n.sele {\n  float: left;\n  padding: 5px 5px 11px 5px;\n  width: 188px;\n  height: 25px; }\n\nspan {\n  font-size: 0.75em; }\n\n.traitsButton:focus {\n  border: 2px solid #EF9719;\n  outline: none; }\n\n/* non-selected class */\n.red,\n.traitsButton {\n  background: #5B5B5B;\n  color: #ffffff;\n  border: none;\n  cursor: pointer;\n  float: left;\n  margin-right: 5px;\n  padding: 7px;\n  transition: background linear .2s;\n  outline: none; }\n\n/* selected class */\n.green {\n  background: green;\n  outline: none; }\n\n/* checkboxs main div */\n.traits {\n  position: relative;\n  top: 0px;\n  left: 0px;\n  z-index: 0;\n  width: 800px;\n  height: 600px;\n  /* background: #484848; */\n  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#383838+0,111111+100 */\n  background: #383838;\n  /* Old browsers */\n  background: -moz-linear-gradient(45deg, #383838 0%, #111111 100%);\n  /* FF3.6-15 */\n  background: -webkit-linear-gradient(45deg, #383838 0%, #111111 100%);\n  /* Chrome10-25,Safari5.1-6 */\n  background: linear-gradient(45deg, #383838 0%, #111111 100%);\n  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */\n  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#383838', endColorstr='#111111', GradientType=1);\n  /* IE6-9 fallback on horizontal gradient */ }\n\n/* buttons */\n.btn {\n  /* background: #D4001D; */\n  border: none;\n  margin-right: 1px;\n  color: #ffffff;\n  display: inline;\n  padding: 5px 5px 7px 5px;\n  cursor: pointer;\n  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#ea001f+0,bf0019+100 */\n  background: #ea001f;\n  /* Old browsers */\n  background: -moz-linear-gradient(top, #ea001f 0%, #bf0019 100%);\n  /* FF3.6-15 */\n  background: -webkit-linear-gradient(top, #ea001f 0%, #bf0019 100%);\n  /* Chrome10-25,Safari5.1-6 */\n  background: linear-gradient(to bottom, #ea001f 0%, #bf0019 100%);\n  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */\n  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ea001f', endColorstr='#bf0019', GradientType=0);\n  /* IE6-9 */ }\n\n.btn:hover {\n  background: #ED5901; }\n\n.tally {\n  position: relative;\n  top: -300px;\n  left: 350px;\n  z-index: 1;\n  width: 430px;\n  height: 600px;\n  float: left;\n  padding: 0px 10px 0px 10px;\n  color: #C1C1C1;\n  overflow-y: auto; }\n\n.tally p {\n  font-size: 0.75em; }\n\n.uselect {\n  float: left;\n  background: #545454;\n  padding: 10px;\n  margin: 5px;\n  font-size: 0.75em;\n  position: relative;\n  top: 0px;\n  left: 0px;\n  z-index: 0;\n  width: 40%;\n  height: auto; }\n\n.ufeminine {\n  border-left: 8px solid #EF9719; }\n\n.umasculine {\n  border-left: 8px solid #D4001D; }\n\n.ifeminine {\n  color: #EF9719 !important; }\n\n.imasculine {\n  color: #D4001D !important; }\n\n.final {\n  float: left;\n  position: relative;\n  top: 0px;\n  left: 0px;\n  z-index: 0;\n  width: 800px;\n  height: 600px; }\n\n.menuButtonBottom {\n  position: relative;\n  top: -49px;\n  left: 518px;\n  z-index: 0;\n  width: 282px;\n  height: auto; }\n\n.finish {\n  padding: 15px; }\n\n.selTraitEmerge {\n  color: #ffffff;\n  /* background: red; */\n  float: left;\n  margin-right: 20px;\n  width: 175px;\n  height: 20px; }\n\n.theTraits h4 {\n  clear: both; }\n\n.percentage {\n  width: 100%;\n  text-align: center; }\n\n.percentM {\n  position: relative;\n  padding: 10px;\n  background: #C3041E;\n  color: #ffffff;\n  float: left;\n  margin-bottom: 10px;\n  width: 45%;\n  height: auto; }\n\n.percentF {\n  position: relative;\n  width: 45%;\n  height: auto;\n  padding: 10px;\n  background: #EF9719;\n  color: #ffffff;\n  float: left;\n  margin-bottom: 10px;\n  width: 45%;\n  height: auto; }\n\n.percentM span, .percentF span {\n  font-size: 2.4em;\n  font-weight: 800; }\n", ""]);
+	exports.push([module.id, "body {\n  background: #ffffff;\n  color: #ffffff;\n  padding: 0;\n  margin: 0;\n  font-family: sans-serif, verdana !important; }\n\n.intro,\n.help_Menu {\n  position: absolute;\n  top: 0px;\n  left: 0px;\n  z-index: 100000;\n  width: 800px;\n  height: 701px;\n  /* background: rgba(0, 0, 0, 0.6); */\n  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#1b1f4e+21,393f7d+38,aa0ce9+55,d4001d+71,ed5901+85,ef9719+98&0.46+0,0.5+100;wmst2 */\n  background: -moz-linear-gradient(top, rgba(27, 31, 78, 0.46) 0%, rgba(27, 31, 78, 0.47) 21%, rgba(57, 63, 125, 0.48) 38%, rgba(170, 12, 233, 0.49) 55%, rgba(212, 0, 29, 0.49) 71%, rgba(237, 89, 1, 0.49) 85%, rgba(239, 151, 25, 0.5) 98%, rgba(239, 151, 25, 0.5) 100%);\n  /* FF3.6-15 */\n  background: -webkit-linear-gradient(top, rgba(27, 31, 78, 0.46) 0%, rgba(27, 31, 78, 0.47) 21%, rgba(57, 63, 125, 0.48) 38%, rgba(170, 12, 233, 0.49) 55%, rgba(212, 0, 29, 0.49) 71%, rgba(237, 89, 1, 0.49) 85%, rgba(239, 151, 25, 0.5) 98%, rgba(239, 151, 25, 0.5) 100%);\n  /* Chrome10-25,Safari5.1-6 */\n  background: linear-gradient(to bottom, rgba(27, 31, 78, 0.46) 0%, rgba(27, 31, 78, 0.47) 21%, rgba(57, 63, 125, 0.48) 38%, rgba(170, 12, 233, 0.49) 55%, rgba(212, 0, 29, 0.49) 71%, rgba(237, 89, 1, 0.49) 85%, rgba(239, 151, 25, 0.5) 98%, rgba(239, 151, 25, 0.5) 100%);\n  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */\n  filter: progid:XImageTransform.Microsoft.gradient( startColorstr='#751b1f4e', endColorstr='#80ef9719', GradientType=0);\n  /* IE6-9 */ }\n\n.intro_Button {\n  opacity: 1 !important;\n  position: relative;\n  top: 150px;\n  left: 220px;\n  z-index: 0;\n  width: 350px;\n  height: 150px;\n  /* background: #4C4C4C; */\n  border: none;\n  cursor: pointer; }\n\n.help_Button {\n  opacity: 1 !important;\n  position: relative;\n  position: relative;\n  top: -70px;\n  left: 388px;\n  z-index: 0;\n  width: 250px;\n  height: 75px;\n  /* background: #D4001D; */\n  border: none;\n  cursor: pointer;\n  color: #ffffff;\n  font-size: 1.5em;\n  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#ea001f+0,bf0019+100 */\n  background: #ea001f;\n  /* Old browsers */\n  background: -moz-linear-gradient(top, #ea001f 0%, #bf0019 100%);\n  /* FF3.6-15 */\n  background: -webkit-linear-gradient(top, #ea001f 0%, #bf0019 100%);\n  /* Chrome10-25,Safari5.1-6 */\n  background: linear-gradient(to bottom, #ea001f 0%, #bf0019 100%);\n  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */\n  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ea001f', endColorstr='#bf0019', GradientType=0);\n  /* IE6-9 */ }\n\n.keyboard_Div {\n  position: relative;\n  top: 165px;\n  left: 62px;\n  z-index: 0;\n  width: 650px;\n  height: 360px;\n  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#383838+0,111111+100 */\n  background: #383838;\n  /* Old browsers */\n  background: -moz-linear-gradient(45deg, #383838 0%, #111111 100%);\n  /* FF3.6-15 */\n  background: -webkit-linear-gradient(45deg, #383838 0%, #111111 100%);\n  /* Chrome10-25,Safari5.1-6 */\n  background: linear-gradient(45deg, #383838 0%, #111111 100%);\n  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */\n  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#383838', endColorstr='#111111', GradientType=1);\n  /* IE6-9 fallback on horizontal gradient */\n  border: 1px solid #444444;\n  padding: 10px; }\n\n.keyboard_Div ul li {\n  list-style: none;\n  color: #ffffff;\n  font-size: 1.3em;\n  margin-bottom: 6px;\n  margin-left: 35px; }\n\n.keyboard_Div h1 {\n  text-align: center;\n  color: #ffffff; }\n\n.keyboard_Div h4 {\n  text-align: left;\n  color: #ffffff; }\n\n.keyboard_Div p {\n  text-align: center;\n  color: #ffffff; }\n\n.help_Button:hover {\n  /*background: #ED5901; */\n  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#f25a02+0,e25402+100 */\n  background: #f25a02;\n  /* Old browsers */\n  background: -moz-linear-gradient(top, #f25a02 0%, #e25402 100%);\n  /* FF3.6-15 */\n  background: -webkit-linear-gradient(top, #f25a02 0%, #e25402 100%);\n  /* Chrome10-25,Safari5.1-6 */\n  background: linear-gradient(to bottom, #f25a02 0%, #e25402 100%);\n  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */\n  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f25a02', endColorstr='#e25402', GradientType=0);\n  /* IE6-9 */ }\n\n.intro_Button:hover {\n  background: #636363; }\n\n.keyButtons {\n  background: #111111;\n  border-radius: 6px;\n  border: 1px solid #A0A0A0;\n  padding: 5px;\n  font-size: 0.7em !important;\n  width: 20px;\n  height: 10px; }\n\n.intro_Button h1 {\n  font-size: 3em;\n  color: #E2E2E2; }\n\n/* hide timeline background container */\n.tl-timenav-slider-background {\n  /*display: none !important;*/ }\n\n/* instructions */\n.instructions {\n  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#1b1f4e+21,393f7d+38,aa0ce9+55,d4001d+71,ed5901+85,ef9719+98;wmst */\n  background: #1b1f4e;\n  /* Old browsers */\n  background: -moz-linear-gradient(left, #1b1f4e 21%, #393f7d 38%, #aa0ce9 55%, #d4001d 71%, #ed5901 85%, #ef9719 98%);\n  /* FF3.6-15 */\n  background: -webkit-linear-gradient(left, #1b1f4e 21%, #393f7d 38%, #aa0ce9 55%, #d4001d 71%, #ed5901 85%, #ef9719 98%);\n  /* Chrome10-25,Safari5.1-6 */\n  background: linear-gradient(to right, #1b1f4e 21%, #393f7d 38%, #aa0ce9 55%, #d4001d 71%, #ed5901 85%, #ef9719 98%);\n  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */\n  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1b1f4e', endColorstr='#ef9719', GradientType=1);\n  /* IE6-9 */\n  position: relative;\n  top: 0px;\n  left: 0px;\n  z-index: 50;\n  width: 780px;\n  height: 50px; }\n\n/* header bar */\n.header {\n  /* background: #222222;*/\n  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#383838+0,111111+100 */\n  background: #383838;\n  /* Old browsers */\n  background: -moz-linear-gradient(45deg, #383838 0%, #111111 100%);\n  /* FF3.6-15 */\n  background: -webkit-linear-gradient(45deg, #383838 0%, #111111 100%);\n  /* Chrome10-25,Safari5.1-6 */\n  background: linear-gradient(45deg, #383838 0%, #111111 100%);\n  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */\n  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#383838', endColorstr='#111111', GradientType=1);\n  /* IE6-9 fallback on horizontal gradient */\n  font-family: sans-serif, verdana !important;\n  color: #f1f1f1;\n  position: relative;\n  top: 0px;\n  left: 0px;\n  z-index: 60;\n  width: 800px;\n  height: 31px; }\n\n.titles {\n  float: left;\n  margin-top: -15px; }\n\n.menu {\n  float: right; }\n\n.sele {\n  padding: 5px 5px 11px 5px;\n  float: left;\n  width: 188px;\n  height: 25px; }\n\nspan {\n  font-size: 0.75em; }\n\n.traitsButton:focus {\n  border: 2px solid #EF9719;\n  outline: none; }\n\n/* non-selected class */\n.red,\n.traitsButton {\n  background: #5B5B5B;\n  color: #ffffff;\n  border: none;\n  cursor: pointer;\n  margin-right: 5px;\n  padding: 7px;\n  transition: background linear .2s;\n  outline: none;\n  float: left; }\n\n/* selected class */\n.green {\n  background: green;\n  outline: none; }\n\n/* checkboxs main div */\n.traits {\n  position: relative;\n  top: 0px;\n  left: 0px;\n  z-index: 0;\n  width: 800px;\n  height: 600px;\n  /* background: #484848; */\n  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#383838+0,111111+100 */\n  background: #383838;\n  /* Old browsers */\n  background: -moz-linear-gradient(45deg, #383838 0%, #111111 100%);\n  /* FF3.6-15 */\n  background: -webkit-linear-gradient(45deg, #383838 0%, #111111 100%);\n  /* Chrome10-25,Safari5.1-6 */\n  background: linear-gradient(45deg, #383838 0%, #111111 100%);\n  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */\n  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#383838', endColorstr='#111111', GradientType=1);\n  /* IE6-9 fallback on horizontal gradient */ }\n\n/* buttons */\n.btn {\n  /* background: #D4001D; */\n  border: none;\n  margin-right: 1px;\n  color: #ffffff;\n  display: inline;\n  padding: 5px 5px 7px 5px;\n  cursor: pointer;\n  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#ea001f+0,bf0019+100 */\n  background: #ea001f;\n  /* Old browsers */\n  background: -moz-linear-gradient(top, #ea001f 0%, #bf0019 100%);\n  /* FF3.6-15 */\n  background: -webkit-linear-gradient(top, #ea001f 0%, #bf0019 100%);\n  /* Chrome10-25,Safari5.1-6 */\n  background: linear-gradient(to bottom, #ea001f 0%, #bf0019 100%);\n  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */\n  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ea001f', endColorstr='#bf0019', GradientType=0);\n  /* IE6-9 */ }\n\n.btn:hover {\n  background: #ED5901; }\n\n.tally {\n  position: relative;\n  top: -300px;\n  left: 350px;\n  z-index: 1;\n  width: 430px;\n  height: 600px;\n  float: left;\n  padding: 0px 10px 0px 10px;\n  color: #C1C1C1;\n  overflow-y: auto; }\n\n.tally p {\n  font-size: 0.75em; }\n\n.uselect {\n  float: left;\n  background: #545454;\n  padding: 10px;\n  margin: 5px;\n  font-size: 0.75em;\n  position: relative;\n  top: 0px;\n  left: 0px;\n  z-index: 0;\n  width: 40%;\n  height: auto; }\n\n.ufeminine {\n  border-left: 8px solid #EF9719; }\n\n.umasculine {\n  border-left: 8px solid #D4001D; }\n\n.ifeminine {\n  color: #EF9719 !important; }\n\n.imasculine {\n  color: #D4001D !important; }\n\n.final {\n  float: left;\n  position: relative;\n  top: 0px;\n  left: 0px;\n  z-index: 0;\n  width: 800px;\n  height: 600px; }\n\n.menuButtonBottom {\n  position: relative;\n  top: -49px;\n  left: 518px;\n  z-index: 0;\n  width: 282px;\n  height: auto; }\n\n.finish {\n  padding: 15px; }\n\n.selTraitEmerge {\n  color: #ffffff;\n  /* background: red; */\n  float: left;\n  margin-right: 20px;\n  width: 175px;\n  height: 20px; }\n\n.theTraits h4 {\n  clear: both; }\n\n.percentage {\n  width: 100%;\n  text-align: center; }\n\n.percentM {\n  position: relative;\n  padding: 10px;\n  background: #C3041E;\n  color: #ffffff;\n  float: left;\n  margin-bottom: 10px;\n  width: 45%;\n  height: auto; }\n\n.percentF {\n  position: relative;\n  width: 45%;\n  height: auto;\n  padding: 10px;\n  background: #EF9719;\n  color: #ffffff;\n  float: left;\n  margin-bottom: 10px;\n  width: 45%;\n  height: auto; }\n\n.percentM span, .percentF span {\n  font-size: 2.4em;\n  font-weight: 800; }\n", ""]);
 
 	// exports
 
@@ -47592,188 +47704,6 @@
 /* 177 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
-	  Copyright (c) 2016 Jed Watson.
-	  Licensed under the MIT License (MIT), see
-	  http://jedwatson.github.io/classnames
-	*/
-	/* global define */
-
-	(function () {
-		'use strict';
-
-		var hasOwn = {}.hasOwnProperty;
-
-		function classNames () {
-			var classes = [];
-
-			for (var i = 0; i < arguments.length; i++) {
-				var arg = arguments[i];
-				if (!arg) continue;
-
-				var argType = typeof arg;
-
-				if (argType === 'string' || argType === 'number') {
-					classes.push(arg);
-				} else if (Array.isArray(arg)) {
-					classes.push(classNames.apply(null, arg));
-				} else if (argType === 'object') {
-					for (var key in arg) {
-						if (hasOwn.call(arg, key) && arg[key]) {
-							classes.push(key);
-						}
-					}
-				}
-			}
-
-			return classes.join(' ');
-		}
-
-		if (typeof module !== 'undefined' && module.exports) {
-			module.exports = classNames;
-		} else if (true) {
-			// register as 'classnames', consistent with npm package name
-			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
-				return classNames;
-			}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-		} else {
-			window.classNames = classNames;
-		}
-	}());
-
-
-/***/ },
-/* 178 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var Footer = function (_React$Component) {
-	    _inherits(Footer, _React$Component);
-
-	    function Footer(props) {
-	        _classCallCheck(this, Footer);
-
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Footer).call(this, props));
-	    }
-
-	    _createClass(Footer, [{
-	        key: "render",
-	        value: function render() {
-	            return _react2.default.createElement(
-	                "div",
-	                { className: "menuButtonBottom" },
-	                _react2.default.createElement("p", { className: "selTraitEmerge" }),
-	                _react2.default.createElement(
-	                    "button",
-	                    { className: "finish btn" },
-	                    "Finish ",
-	                    _react2.default.createElement("i", { className: "fa fa-arrow-right" })
-	                )
-	            );
-	        }
-	    }]);
-
-	    return Footer;
-	}(_react2.default.Component);
-
-	exports.default = Footer;
-
-/***/ },
-/* 179 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var Header = function (_React$Component) {
-	    _inherits(Header, _React$Component);
-
-	    function Header(props) {
-	        _classCallCheck(this, Header);
-
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Header).call(this, props));
-	    }
-
-	    _createClass(Header, [{
-	        key: "render",
-	        value: function render() {
-	            return _react2.default.createElement(
-	                "div",
-	                { className: "header" },
-	                _react2.default.createElement(
-	                    "div",
-	                    { className: "titles" },
-	                    _react2.default.createElement(
-	                        "h5",
-	                        null,
-	                        "Conventional Gender Attributes - What attributes most align with your sense of self?"
-	                    )
-	                ),
-	                _react2.default.createElement(
-	                    "div",
-	                    { className: "menu" },
-	                    _react2.default.createElement(
-	                        "button",
-	                        { className: "reload btn", title: "Reload" },
-	                        _react2.default.createElement("i", { className: "fa fa-refresh" }),
-	                        " Reload"
-	                    ),
-	                    _react2.default.createElement(
-	                        "button",
-	                        { className: "help btn", title: "Help Menu" },
-	                        _react2.default.createElement("i", { className: "fa fa-question-circle" }),
-	                        " Help"
-	                    )
-	                )
-	            );
-	        }
-	    }]);
-
-	    return Header;
-	}(_react2.default.Component);
-
-	exports.default = Header;
-
-/***/ },
-/* 180 */
-/***/ function(module, exports, __webpack_require__) {
-
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
@@ -47889,6 +47819,193 @@
 	  }
 	});
 	module.exports = exports['default'];
+
+/***/ },
+/* 178 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+	  Copyright (c) 2016 Jed Watson.
+	  Licensed under the MIT License (MIT), see
+	  http://jedwatson.github.io/classnames
+	*/
+	/* global define */
+
+	(function () {
+		'use strict';
+
+		var hasOwn = {}.hasOwnProperty;
+
+		function classNames () {
+			var classes = [];
+
+			for (var i = 0; i < arguments.length; i++) {
+				var arg = arguments[i];
+				if (!arg) continue;
+
+				var argType = typeof arg;
+
+				if (argType === 'string' || argType === 'number') {
+					classes.push(arg);
+				} else if (Array.isArray(arg)) {
+					classes.push(classNames.apply(null, arg));
+				} else if (argType === 'object') {
+					for (var key in arg) {
+						if (hasOwn.call(arg, key) && arg[key]) {
+							classes.push(key);
+						}
+					}
+				}
+			}
+
+			return classes.join(' ');
+		}
+
+		if (typeof module !== 'undefined' && module.exports) {
+			module.exports = classNames;
+		} else if (true) {
+			// register as 'classnames', consistent with npm package name
+			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
+				return classNames;
+			}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+		} else {
+			window.classNames = classNames;
+		}
+	}());
+
+
+/***/ },
+/* 179 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Footer = function (_React$Component) {
+	    _inherits(Footer, _React$Component);
+
+	    function Footer(props) {
+	        _classCallCheck(this, Footer);
+
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Footer).call(this, props));
+	    }
+
+	    _createClass(Footer, [{
+	        key: "render",
+	        value: function render() {
+	            return _react2.default.createElement(
+	                "div",
+	                { className: "menuButtonBottom" },
+	                _react2.default.createElement("p", { className: "selTraitEmerge" }),
+	                _react2.default.createElement(
+	                    "button",
+	                    { className: "finish btn" },
+	                    "Finish ",
+	                    _react2.default.createElement("i", { className: "fa fa-arrow-right" })
+	                )
+	            );
+	        }
+	    }]);
+
+	    return Footer;
+	}(_react2.default.Component);
+
+	exports.default = Footer;
+
+/***/ },
+/* 180 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Header = function (_React$Component) {
+	    _inherits(Header, _React$Component);
+
+	    function Header(props) {
+	        _classCallCheck(this, Header);
+
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Header).call(this, props));
+	    }
+
+	    _createClass(Header, [{
+	        key: "reloadPage",
+	        value: function reloadPage() {
+	            location.reload();
+	        }
+	    }, {
+	        key: "render",
+	        value: function render() {
+	            return _react2.default.createElement(
+	                "div",
+	                { className: "header" },
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "titles" },
+	                    _react2.default.createElement(
+	                        "h5",
+	                        null,
+	                        "Conventional Gender Attributes - What attributes most align with your sense of self?"
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "menu" },
+	                    _react2.default.createElement(
+	                        "button",
+	                        { className: "reload btn", title: "Reload", onClick: this.reloadPage.bind() },
+	                        _react2.default.createElement("i", { className: "fa fa-refresh" }),
+	                        " Reload"
+	                    ),
+	                    _react2.default.createElement(
+	                        "button",
+	                        { className: "help btn", title: "Help Menu" },
+	                        _react2.default.createElement("i", { className: "fa fa-question-circle" }),
+	                        " Help"
+	                    )
+	                )
+	            );
+	        }
+	    }]);
+
+	    return Header;
+	}(_react2.default.Component);
+
+	exports.default = Header;
 
 /***/ }
 /******/ ]);
